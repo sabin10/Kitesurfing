@@ -6,13 +6,19 @@ import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import android.content.IntentFilter;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,43 +30,47 @@ import com.example.sabin.kitesurfing.service.GetData;
 import com.example.sabin.kitesurfing.service.RetrofitClient;
 import com.example.sabin.kitesurfing.service.Spots;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView textSample;
-    private Button btnSample;
-    //public static String accesToken = "";
+
+    private androidx.appcompat.widget.Toolbar mainToolbar;
     public static final String TOKEN_KEY = "tokenKey";
 
+    //pentru lista
+    RecyclerView spotsListView; //done
+    //List<Spots.Result> spotsList;
+    SpotRecycleAdapter spotRecycleAdapter;
 
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 
         @Override
-        public void onReceive(Context context, Intent intent) {
-            
+        public void onReceive(final Context context, Intent intent) {
+
             String accesToken = intent.getStringExtra(TOKEN_KEY);
-            textSample.setText("" + accesToken);
 
             //2. lista
             GetData service = RetrofitClient.getRetrofitInstance().create(GetData.class);
-            Call<Spots> callGetAllSpots = service.getAllSpots(accesToken, new FilterSpot());
+            Call<Spots> callGetAllSpots = service.getAllSpots(accesToken, new FilterSpot(90));
 
             callGetAllSpots.enqueue(new Callback<Spots>() {
                 @Override
                 public void onResponse(Call<Spots> call, Response<Spots> response) {
+
                     List<Spots.Result> spots = response.body().getResult();
-                    for (Spots.Result s : spots) {
-                        Log.i("vasile", ""+ s.getName());
-                    }
+                    spotRecycleAdapter = new SpotRecycleAdapter(spots);
+                    spotsListView.setLayoutManager(new LinearLayoutManager(context));
+                    spotsListView.setAdapter(spotRecycleAdapter);
 
                 }
 
                 @Override
                 public void onFailure(Call<Spots> call, Throwable t) {
-
+                    Log.i("Lista", "Eroare endpointul 2");
                 }
             });
 
@@ -74,57 +84,40 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        textSample = findViewById(R.id.textsample);
-        btnSample = findViewById(R.id.btn_sample);
+        //toolbar Kitesurfing App
+        mainToolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(mainToolbar);
+        getSupportActionBar().setTitle("Kitesurfing App");
+        getSupportActionBar().getThemedContext();
+        mainToolbar.setTitleTextColor(getResources().getColor(R.color.colorWhite));
+
+        //initializare lista
+        spotsListView = findViewById(R.id.spots_list);
 
         toBackgroundService();
 
-        //handler pentru interfata GetData
-        //GetData service = RetrofitClient.getRetrofitInstance().create(GetData.class);
+    }
 
-        /**
-        //1. retrieve token
-        Call<User> callGetToken = service.getUser(new Email("sabinhantu@gmail.com"));
-        //Execute the request asynchronously
-        callGetToken.enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                accesToken = response.body().getResult().getToken();
-                //Toast.makeText(MainActivity.this, "TOKEN " + accesToken, Toast.LENGTH_SHORT).show();
-                RetrofitClient.setToken(accesToken);
-                textSample.setText(RetrofitClient.getToken() + " " + response.body().getResult().getEmail());
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
 
-            }
+        Drawable drawable = menu.getItem(0).getIcon();
+        drawable.setColorFilter(getResources().getColor(R.color.colorWhite), PorterDuff.Mode.SRC_ATOP);
 
-            @Override
-            public void onFailure(Call<User> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "CALL FAILURE", Toast.LENGTH_SHORT).show();
-            }
-        });
-         */
+        return true;
+    }
 
-        /*
-        //2. retrieve list
-        Call<Spots> callGetAllSpots = service.getAllSpots(accesToken, new FilterSpot("India"));
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.item_filter) {
+            toFilterActivity();
+        }
+        return false;
+    }
 
-        callGetAllSpots.enqueue(new Callback<Spots>() {
-            @Override
-            public void onResponse(Call<Spots> call, Response<Spots> response) {
-                List<Spots.Result> spots = response.body().getResult();
-
-                for (Spots.Result s : spots) {
-                    Log.i("vasile", ""+ s.getName());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Spots> call, Throwable t) {
-
-            }
-        });
-         */
-
-
+    private void toFilterActivity() {
+        startActivity(new Intent(MainActivity.this, FilterActivity.class));
     }
 
     private void toBackgroundService() {

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.sabin.kitesurfing.Global;
 import com.example.sabin.kitesurfing.MainActivity;
 
 import androidx.annotation.Nullable;

@@ -40,5 +40,6 @@ dependencies {
     //ceva nullable error
     implementation 'androidx.annotation:annotation:1.1.0-alpha01'
     implementation 'org.jetbrains:annotations-java5:15.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
 
 }
