@@ -44,6 +44,12 @@ public interface GetData {
             @Body SpotId SpotId
     );
 
+    //get countries
+    @Headers("Content-Type: application/json")
+    @POST("api-spot-get-countries")
+    Call<SpotCountries> getSpotCountries(@Header("token") String token);
+
+
 
 }
 

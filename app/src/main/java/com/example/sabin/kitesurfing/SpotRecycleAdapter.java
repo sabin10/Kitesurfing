@@ -27,7 +27,11 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
 
     private List<Spots.Result> spots;
     private Context context;
-    private String accesToken;
+    private static String accesToken;
+
+    public static String getAccesToken() {
+        return accesToken;
+    }
 
     public SpotRecycleAdapter(List<Spots.Result> spots, String accesToken) {
         this.spots = spots;
