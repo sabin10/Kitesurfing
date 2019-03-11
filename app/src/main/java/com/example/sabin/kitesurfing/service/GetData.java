@@ -28,6 +28,22 @@ public interface GetData {
     );
 
 
+    //add spot to favorites
+    @Headers("Content-Type: application/json")
+    @POST("api-spot-favorites-add")
+    Call<SpotFavoriteResult> addSpotToFavorites(
+            @Header("token") String token,
+            @Body SpotId SpotId
+    );
+
+    //remove spot from favorites
+    @Headers("Content-Type: application/json")
+    @POST("api-spot-favorites-remove")
+    Call<SpotFavoriteResult> removeSpotFromFavorites(
+            @Header("token") String token,
+            @Body SpotId SpotId
+    );
+
 
 }
 

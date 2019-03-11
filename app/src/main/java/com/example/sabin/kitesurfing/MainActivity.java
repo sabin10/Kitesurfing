@@ -51,18 +51,18 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(final Context context, Intent intent) {
 
-            String accesToken = intent.getStringExtra(TOKEN_KEY);
+            final String accesToken = intent.getStringExtra(TOKEN_KEY);
 
             //2. lista
             GetData service = RetrofitClient.getRetrofitInstance().create(GetData.class);
-            Call<Spots> callGetAllSpots = service.getAllSpots(accesToken, new FilterSpot(90));
+            Call<Spots> callGetAllSpots = service.getAllSpots(accesToken, new FilterSpot());
 
             callGetAllSpots.enqueue(new Callback<Spots>() {
                 @Override
                 public void onResponse(Call<Spots> call, Response<Spots> response) {
 
                     List<Spots.Result> spots = response.body().getResult();
-                    spotRecycleAdapter = new SpotRecycleAdapter(spots);
+                    spotRecycleAdapter = new SpotRecycleAdapter(spots, accesToken); //tokenul este trimis in adapter
                     spotsListView.setLayoutManager(new LinearLayoutManager(context));
                     spotsListView.setAdapter(spotRecycleAdapter);
 

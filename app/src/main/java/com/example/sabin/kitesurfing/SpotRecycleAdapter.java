@@ -1,6 +1,7 @@
 package com.example.sabin.kitesurfing;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,20 +9,29 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.sabin.kitesurfing.service.GetData;
+import com.example.sabin.kitesurfing.service.RetrofitClient;
+import com.example.sabin.kitesurfing.service.SpotFavoriteResult;
+import com.example.sabin.kitesurfing.service.SpotId;
 import com.example.sabin.kitesurfing.service.Spots;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.ViewHolder> {
 
     private List<Spots.Result> spots;
     private Context context;
+    private String accesToken;
 
-    public SpotRecycleAdapter(List<Spots.Result> spots) {
+    public SpotRecycleAdapter(List<Spots.Result> spots, String accesToken) {
         this.spots = spots;
+        this.accesToken = accesToken;
     }
 
     @NonNull
@@ -34,21 +44,68 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         holder.setIsRecyclable(false);
 
         String name = spots.get(position).getName();
         String country = spots.get(position).getCountry();
-        boolean isFavorite = spots.get(position).isFavorite();
-
         holder.setNameCountry(name, country);
+
+        final String spotId = spots.get(position).getId();
+        final boolean isFavorite = spots.get(position).isFavorite();
+        holder.setFavoriteIcon(isFavorite);
 
         holder.isFavoriteView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+
+                GetData service = RetrofitClient.getRetrofitInstance().create(GetData.class);
+
+                if (spots.get(position).isFavorite() == false) {
+                    // cand spotul nu e la favorite si se da click pe el
+                    // => se baga la favorite
+
+                    holder.setFavoriteIcon(true);
+                    spots.get(position).setFavorite(true);
+
+                    Call<SpotFavoriteResult> callAddToFavorites = service.addSpotToFavorites(accesToken, new SpotId(spotId));
+                    callAddToFavorites.enqueue(new Callback<SpotFavoriteResult>() {
+                        @Override
+                        public void onResponse(Call<SpotFavoriteResult> call, Response<SpotFavoriteResult> response) {
+                            Log.i("AddFavorite", "Succes");
+                        }
+
+                        @Override
+                        public void onFailure(Call<SpotFavoriteResult> call, Throwable t) {
+                            Log.i("AddFavorite", "Failure");
+                        }
+                    });
+                } else {
+                    //spotul e la favorite si se da click pe el
+                    // => se sterge de la favorite
+
+                    holder.setFavoriteIcon(false);
+                    spots.get(position).setFavorite(false);
+
+                    Call<SpotFavoriteResult> callRemoveFromFavorites = service.removeSpotFromFavorites(accesToken, new SpotId(spotId));
+                    callRemoveFromFavorites.enqueue(new Callback<SpotFavoriteResult>() {
+                        @Override
+                        public void onResponse(Call<SpotFavoriteResult> call, Response<SpotFavoriteResult> response) {
+                            Log.i("RemoveFavorite", "Succes");
+                        }
+
+                        @Override
+                        public void onFailure(Call<SpotFavoriteResult> call, Throwable t) {
+                            Log.i("RemoveFavorite", "Failure");
+                        }
+                    });
+                }
+
+                notifyDataSetChanged();
+
             }
         });
+
 
 
 
@@ -80,5 +137,14 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
             nameView.setText(name);
             countryView.setText(country);
         }
+
+        public void setFavoriteIcon(boolean isFavorite) {
+            if (isFavorite) {
+                isFavoriteView.setImageResource(R.mipmap.staron);
+            } else {
+                isFavoriteView.setImageResource(R.mipmap.staroff);
+            }
+        }
+
     }
 }
