@@ -1,6 +1,7 @@
 package com.example.sabin.kitesurfing;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,6 +60,7 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
         final boolean isFavorite = spots.get(position).isFavorite();
         holder.setFavoriteIcon(isFavorite);
 
+
         holder.isFavoriteView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -104,11 +106,12 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
                         }
                     });
                 }
-
                 notifyDataSetChanged();
-
             }
         });
+
+
+
 
 
 
@@ -120,8 +123,9 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
         return spots.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
+        public static final String SPOT_ID = "spotId";
         private View mView;
         private TextView nameView;
         private TextView countryView;
@@ -135,6 +139,16 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
             countryView = mView.findViewById(R.id.spot_country);
             isFavoriteView = mView.findViewById(R.id.spot_favorite);
 
+            mView.setOnClickListener(this);
+
+        }
+
+        @Override
+        public void onClick(View v) {
+            //cand se apasa pe un item
+            String spotId = spots.get(getAdapterPosition()).getId();
+            //Toast.makeText(context, "APASAREEE" + spotId, Toast.LENGTH_SHORT).show();
+            goToDetails(spotId);
         }
 
         public void setNameCountry(String name, String country) {
@@ -148,6 +162,12 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
             } else {
                 isFavoriteView.setImageResource(R.mipmap.staroff);
             }
+        }
+
+        public void goToDetails(String spotId) {
+            Intent intent = new Intent(context, DetailsActivity.class);
+            intent.putExtra(SPOT_ID, spotId);
+            context.startActivity(intent);
         }
 
     }

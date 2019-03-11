@@ -22,13 +22,14 @@
 
         <service
             android:name=".service.BackgroundService"
-            android:exported="false"
-        />
+            android:exported="false" />
 
         <activity
             android:name=".FilterActivity"
-            android:parentActivityName=".MainActivity"
-        />
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".DetailsActivity"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

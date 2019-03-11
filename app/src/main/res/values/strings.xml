@@ -4,4 +4,8 @@
     <string name="enter_country">Enter country</string>
     <string name="wind_probability">Wind Probability</string>
     <string name="apply">Apply</string>
+    <string name="latitude">Latitudede</string>
+    <string name="lat">Latitude</string>
+    <string name="windprobability">Wind Probability</string>
+    <string name="whentogo">When to Go</string>
 </resources>

@@ -140,8 +140,4 @@ public class FilterActivity extends AppCompatActivity {
         return Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
     }
 
-
-
-
-
 }
