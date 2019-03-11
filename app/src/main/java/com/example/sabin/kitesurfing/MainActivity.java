@@ -40,9 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private androidx.appcompat.widget.Toolbar mainToolbar;
     public static final String TOKEN_KEY = "tokenKey";
 
-    //pentru lista
-    RecyclerView spotsListView; //done
-    //List<Spots.Result> spotsList;
+    //lista
+    RecyclerView spotsListView;
     SpotRecycleAdapter spotRecycleAdapter;
 
 
@@ -52,10 +51,14 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(final Context context, Intent intent) {
 
             final String accesToken = intent.getStringExtra(TOKEN_KEY);
+            String country = intent.getStringExtra(FilterActivity.EXTRA_COUNTRY);
+            int windProbability = intent.getIntExtra(FilterActivity.EXTRA_WIND, 0);
+
+            //Log.i("onReceive", "" + country + windProbability);
 
             //2. lista
             GetData service = RetrofitClient.getRetrofitInstance().create(GetData.class);
-            Call<Spots> callGetAllSpots = service.getAllSpots(accesToken, new FilterSpot());
+            Call<Spots> callGetAllSpots = service.getAllSpots(accesToken, new FilterSpot(country, windProbability));
 
             callGetAllSpots.enqueue(new Callback<Spots>() {
                 @Override
@@ -73,9 +76,6 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("Lista", "Eroare endpointul 2");
                 }
             });
-
-
-            Log.i("mainSabin", "" + accesToken);
         }
     };
 
@@ -94,7 +94,19 @@ public class MainActivity extends AppCompatActivity {
         //initializare lista
         spotsListView = findViewById(R.id.spots_list);
 
-        toBackgroundService();
+        Intent intent = getIntent();
+        String country = intent.getStringExtra(FilterActivity.EXTRA_COUNTRY);
+        int windProbability = intent.getIntExtra(FilterActivity.EXTRA_WIND, 0);
+
+        //verific daca activitatea a fost pornita by default sau din intentul de la filter
+        //trimit country si windProbability in backgroundService ca sa le pot accesa in broadcastReceiver
+        if (country == null) {
+            //activitatea a pornit by default
+            toBackgroundService("", 0);
+        } else {
+            //activitatea a pornit din FilterActivity
+            toBackgroundService(country, windProbability);
+        }
 
     }
 
@@ -120,8 +132,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(MainActivity.this, FilterActivity.class));
     }
 
-    private void toBackgroundService() {
+    private void toBackgroundService(String country, int windProbability) {
         Intent toBackground = new Intent(MainActivity.this, BackgroundService.class);
+        toBackground.putExtra(FilterActivity.EXTRA_COUNTRY, country);
+        toBackground.putExtra(FilterActivity.EXTRA_WIND, windProbability);
         startService(toBackground);
     }
 

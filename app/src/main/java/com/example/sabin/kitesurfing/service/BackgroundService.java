@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.sabin.kitesurfing.FilterActivity;
 import com.example.sabin.kitesurfing.Global;
 import com.example.sabin.kitesurfing.MainActivity;
 
@@ -25,6 +26,10 @@ public class BackgroundService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable final Intent intent) {
+
+        final String country = intent.getStringExtra(FilterActivity.EXTRA_COUNTRY);
+        final int windProbability = intent.getIntExtra(FilterActivity.EXTRA_WIND, 0);
+
         GetData service = RetrofitClient.getRetrofitInstance()
                 .create(GetData.class);
         Call<User> callGetToken = service.getUser(new Email(EMAIL_STRING));
@@ -34,9 +39,7 @@ public class BackgroundService extends IntentService {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 String accesToken = response.body().getResult().getToken();
-                Log.i("toma", "" + accesToken);
-                sendTokenToActivity(accesToken);
-
+                sendTokenToActivity(accesToken, country, windProbability);
             }
 
             @Override
@@ -46,9 +49,11 @@ public class BackgroundService extends IntentService {
         });
     }
 
-    private void sendTokenToActivity(String tokenValue) {
+    private void sendTokenToActivity(String tokenValue, String country, int windProbability) {
         Intent intent = new Intent(INTENT_SERVICE_MESSAGE);
         intent.putExtra(MainActivity.TOKEN_KEY, tokenValue);
+        intent.putExtra(FilterActivity.EXTRA_COUNTRY, country);
+        intent.putExtra(FilterActivity.EXTRA_WIND, windProbability);
 
         LocalBroadcastManager.getInstance(getApplicationContext())
                 .sendBroadcast(intent);
