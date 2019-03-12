@@ -54,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
             String country = intent.getStringExtra(FilterActivity.EXTRA_COUNTRY);
             int windProbability = intent.getIntExtra(FilterActivity.EXTRA_WIND, 0);
 
-            //Log.i("onReceive", "" + country + windProbability);
-
             //2. lista
             GetData service = RetrofitClient.getRetrofitInstance().create(GetData.class);
             Call<Spots> callGetAllSpots = service.getAllSpots(accesToken, new FilterSpot(country, windProbability));
@@ -68,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
                     spotRecycleAdapter = new SpotRecycleAdapter(spots, accesToken); //tokenul este trimis in adapter
                     spotsListView.setLayoutManager(new LinearLayoutManager(context));
                     spotsListView.setAdapter(spotRecycleAdapter);
-
                 }
 
                 @Override

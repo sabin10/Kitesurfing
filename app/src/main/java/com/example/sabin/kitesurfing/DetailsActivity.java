@@ -118,10 +118,7 @@ public class DetailsActivity extends AppCompatActivity implements OnMapReadyCall
         }
         mMapView = findViewById(R.id.details_map);
         mMapView.onCreate(mapViewBundle);
-
         mMapView.getMapAsync(this);
-
-
     }
 
     @Override

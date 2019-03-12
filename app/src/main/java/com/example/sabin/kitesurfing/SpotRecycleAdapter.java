@@ -109,13 +109,6 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
                 notifyDataSetChanged();
             }
         });
-
-
-
-
-
-
-
     }
 
     @Override
@@ -134,14 +127,13 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            mView = itemView;
 
+            mView = itemView;
             nameView = mView.findViewById(R.id.spot_name);
             countryView = mView.findViewById(R.id.spot_country);
             isFavoriteView = mView.findViewById(R.id.spot_favorite);
 
             mView.setOnClickListener(this);
-
         }
 
         @Override
@@ -149,7 +141,6 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
             //cand se apasa pe un item
             String spotId = spots.get(getAdapterPosition()).getId();
             boolean isFavorite = spots.get(getAdapterPosition()).isFavorite();
-            //Toast.makeText(context, "APASAREEE" + spotId, Toast.LENGTH_SHORT).show();
             goToDetails(spotId, isFavorite);
         }
 
@@ -172,6 +163,5 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
             intent.putExtra(IS_FAVORITE, isFavorite);
             context.startActivity(intent);
         }
-
     }
 }

@@ -34,19 +34,17 @@ public class FilterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filter);
 
-        //toolbar Kitesurfing App
+        //toolbar
         mainToolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
         getSupportActionBar().setTitle("Filter");
         getSupportActionBar().getThemedContext();
         mainToolbar.setTitleTextColor(getResources().getColor(R.color.colorWhite));
 
-
         countryView = findViewById(R.id.filter_country);
         windView = findViewById(R.id.filter_wind_probability);
         filterBtn = findViewById(R.id.btn_filter);
 
-        //to do: transmite country si filter catre MainActivity
         filterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
