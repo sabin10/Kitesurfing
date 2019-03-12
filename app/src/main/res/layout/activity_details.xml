@@ -98,7 +98,7 @@
         app:layout_constraintTop_toBottomOf="@+id/details_longitude" />
 
     <TextView
-        android:id="@+id/details_win_probability"
+        android:id="@+id/details_wind_probability"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -117,7 +117,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/details_win_probability" />
+        app:layout_constraintTop_toBottomOf="@+id/details_wind_probability" />
 
     <TextView
         android:id="@+id/details_when_to_go"

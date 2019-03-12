@@ -126,6 +126,7 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         public static final String SPOT_ID = "spotId";
+        public static final String IS_FAVORITE = "isFavorite";
         private View mView;
         private TextView nameView;
         private TextView countryView;
@@ -147,8 +148,9 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
         public void onClick(View v) {
             //cand se apasa pe un item
             String spotId = spots.get(getAdapterPosition()).getId();
+            boolean isFavorite = spots.get(getAdapterPosition()).isFavorite();
             //Toast.makeText(context, "APASAREEE" + spotId, Toast.LENGTH_SHORT).show();
-            goToDetails(spotId);
+            goToDetails(spotId, isFavorite);
         }
 
         public void setNameCountry(String name, String country) {
@@ -164,9 +166,10 @@ public class SpotRecycleAdapter extends RecyclerView.Adapter<SpotRecycleAdapter.
             }
         }
 
-        public void goToDetails(String spotId) {
+        public void goToDetails(String spotId, boolean isFavorite) {
             Intent intent = new Intent(context, DetailsActivity.class);
             intent.putExtra(SPOT_ID, spotId);
+            intent.putExtra(IS_FAVORITE, isFavorite);
             context.startActivity(intent);
         }
 

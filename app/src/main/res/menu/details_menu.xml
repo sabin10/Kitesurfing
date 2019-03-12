@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/details_menu_favorite"
-        android:icon="@mipmap/staroff"
+        android:icon="@drawable/staroffwhite"
         android:title="Item"
         app:showAsAction="always" />
 </menu>
