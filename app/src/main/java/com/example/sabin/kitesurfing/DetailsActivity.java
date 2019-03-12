@@ -21,9 +21,18 @@ import com.example.sabin.kitesurfing.service.RetrofitClient;
 import com.example.sabin.kitesurfing.service.SpotDetails;
 import com.example.sabin.kitesurfing.service.SpotFavoriteResult;
 import com.example.sabin.kitesurfing.service.SpotId;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-public class DetailsActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
 
+public class DetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    //widgets
     private androidx.appcompat.widget.Toolbar mainToolbar;
     private TextView countryView;
     private TextView latitudeView;
@@ -31,21 +40,28 @@ public class DetailsActivity extends AppCompatActivity {
     private TextView windProbabilityView;
     private TextView whenToGoView;
     private Menu menu;
+    private MapView mMapView;
+
+    //vars
     private boolean isFavoriteFromIntent;
-    private GetData service;
     private String token;
     private String spotId;
+    private LatLng latLngs;
 
+    //constants
+    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+
+    //services
+    private GetData service;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
-        //toolbar Kitesurfing App
+        //toolbar
         mainToolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
-        //getSupportActionBar().setTitle("Filter");
         getSupportActionBar().getThemedContext();
         mainToolbar.setTitleTextColor(getResources().getColor(R.color.colorWhite));
 
@@ -59,8 +75,8 @@ public class DetailsActivity extends AppCompatActivity {
         Intent intent = getIntent();
         spotId = intent.getStringExtra(SpotRecycleAdapter.ViewHolder.SPOT_ID);
         isFavoriteFromIntent = intent.getBooleanExtra(SpotRecycleAdapter.ViewHolder.IS_FAVORITE, false);
-
         token = SpotRecycleAdapter.getAccesToken();
+
 
         service = RetrofitClient.getRetrofitInstance().create(GetData.class);
         Call<SpotDetails> callGetDetails = service.getSpotDetails(token, new SpotId(spotId));
@@ -74,7 +90,11 @@ public class DetailsActivity extends AppCompatActivity {
                 double longitude = response.body().getResult().getLongitude();
                 int windProbability = response.body().getResult().getWindProbability();
                 String whenToGo = response.body().getResult().getWhenToGo();
-                boolean isFavorite = response.body().getResult().isFavorite();
+                //boolean isFavorite = response.body().getResult().isFavorite(); //never used
+
+                //adauga in lista lat si long
+                LatLng latLng2 = new LatLng(latitude, longitude);
+                latLngs = latLng2;
 
                 getSupportActionBar().setTitle(name);
                 countryView.setText(country);
@@ -83,10 +103,6 @@ public class DetailsActivity extends AppCompatActivity {
                 windProbabilityView.setText(Integer.toString(windProbability));
                 whenToGoView.setText(whenToGo);
 
-                if (isFavorite) {
-                    //daca spotul e favorit, se initializeaza iconul de favorit
-                    menu.getItem(0).setIcon(ContextCompat.getDrawable(DetailsActivity.this, R.drawable.staronwhite));
-                }
             }
 
             @Override
@@ -95,6 +111,16 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
 
+        //map
+        Bundle mapViewBundle = null;
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+        }
+        mMapView = findViewById(R.id.details_map);
+        mMapView.onCreate(mapViewBundle);
+
+        mMapView.getMapAsync(this);
+
 
     }
 
@@ -102,6 +128,10 @@ public class DetailsActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.details_menu, menu);
         this.menu = menu;
+
+        if (isFavoriteFromIntent) {
+            menu.getItem(0).setIcon(ContextCompat.getDrawable(DetailsActivity.this, R.drawable.staronwhite));
+        }
 
         return true;
     }
@@ -162,5 +192,64 @@ public class DetailsActivity extends AppCompatActivity {
             //newValue = false
             item.setIcon(ContextCompat.getDrawable(DetailsActivity.this, R.drawable.staroffwhite));
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
+        if (mapViewBundle == null) {
+            mapViewBundle = new Bundle();
+            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
+        }
+
+        mMapView.onSaveInstanceState(mapViewBundle);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mMapView.onResume();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mMapView.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mMapView.onStop();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        if (map == null || latLngs == null) {
+            return;
+        }
+        double latitude = latLngs.latitude;
+        double longitude = latLngs.longitude;
+        map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("Marker"));
+    }
+
+    @Override
+    protected void onPause() {
+        mMapView.onPause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mMapView.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mMapView.onLowMemory();
     }
 }
